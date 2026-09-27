@@ -1,0 +1,6 @@
+{
+  "name": "Ermias Getachew Hailu - Banking Portfolio & PWA",
+  "description": "Multi-page professional banking operations portfolio, verified credentials vault, interactive cash calculator, ATS application studio, and installable PWA for Ermias Getachew Hailu.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
