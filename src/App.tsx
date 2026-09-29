@@ -27,6 +27,7 @@ import { QuotesShowcase } from './components/QuotesShowcase';
 import { Footer } from './components/Footer';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { WelcomeLanding } from './components/WelcomeLanding';
+import { PwaHubView } from './components/PwaHubView';
 
 import {
   initialProfile,
@@ -63,6 +64,7 @@ import {
   ChevronRight,
   Sparkles,
   Quote,
+  Smartphone,
 } from 'lucide-react';
 
 const VALID_PAGES: PageRoute[] = [
@@ -73,6 +75,7 @@ const VALID_PAGES: PageRoute[] = [
   'essays',
   'studio',
   'contact',
+  'pwa',
 ];
 
 export default function App() {
@@ -360,6 +363,7 @@ export default function App() {
                   {currentPage === 'creeds' && 'Leadership Creeds & Perspectives'}
                   {currentPage === 'essays' && 'Analytical Essays & Cultural Media Shelf'}
                   {currentPage === 'studio' && 'ATS Application Studio & Tailored Résumé'}
+                  {currentPage === 'pwa' && 'Progressive Web App (PWA) & Offline Hub'}
                   {currentPage === 'contact' && 'Direct Channels & Institutional Inquiries'}
                 </span>
               </div>
@@ -628,6 +632,13 @@ export default function App() {
             {currentPage === 'contact' && (
               <div className="space-y-12">
                 <ContactSection profile={profile} onNewMessage={handleNewInquiry} />
+              </div>
+            )}
+
+            {/* ================= PAGE: PWA HUB ================= */}
+            {currentPage === 'pwa' && (
+              <div className="space-y-12">
+                <PwaHubView profile={profile} onToast={showToast} />
               </div>
             )}
 

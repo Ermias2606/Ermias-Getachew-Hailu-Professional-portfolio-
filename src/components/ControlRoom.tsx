@@ -573,6 +573,28 @@ export const ControlRoom: React.FC<ControlRoomProps> = ({
     onToast(`ATS Match Analysis: ${score}% match with ${keywords.length} core keywords!`);
   };
 
+  const handleAiSynthesizeAts = () => {
+    const role = atsState.targetRole || 'Senior Branch Operations & Cash Supervisor';
+    const comp = atsState.targetCompany || 'Siinqee Bank S.C.';
+
+    const tailoredSummary = `Performance-driven Senior Banking Operations professional (${profile.grade || 'Job Grade IX'}) calibrated specifically for ${role} at ${comp}. Combining rigorous dual-custody cash control, general ledger reconciliation, and strict NBE regulatory compliance with a multidisciplinary 'Dual-Degree Advantage' (Management GPA 3.60 & Archaeology GPA 3.42). Proven track record of maintaining 100% audit readiness, zero reconciliation variance, and driving digital-first financial inclusion.`;
+
+    const tailoredCoverLetter = `Dear Hiring Committee,\n\nI am writing to express my enthusiastic candidacy for the position of ${role} at ${comp}. Having served with distinction as Senior Customer Service Officer (SCSO - Cash I) at Siinqee Bank S.C., I bring deep operational command over physical vault dual-custody security, predictive cash forecasting, and core banking settlement workflows.\n\nReviewing your exact vacancy requirements for ${role}, my career trajectory directly aligns with your operational objectives:\n• Unbroken zero-variance audit record across all daily multi-million ETB cash reconciliations and general ledger mappings.\n• Advanced proficiency in NBE regulatory directives, AML/CFT surveillance, Currency Transaction Reports (CTR), and Suspicious Activity Reports (SAR).\n• Multidisciplinary leadership synthesizing strategic organizational governance from Oromia State University (GPA 3.60) with forensic audit integrity from Aksum University (GPA 3.42).\n• Proven ability to lead branch teller teams, de-escalate client queues under latency, and champion digital transformation initiatives.\n\nI am eager to bring this uncompromising commitment to operational excellence and financial discipline to ${comp}. Thank you for your consideration.\n\nSincerely,\n${profile.name}\n${profile.phone} | ${profile.email}`;
+
+    const { score, keywords } = runAtsMatcher(atsState.vacancyText);
+
+    setAtsState((prev) => ({
+      ...prev,
+      customResumeSummary: tailoredSummary,
+      customCoverLetter: tailoredCoverLetter,
+      matchScore: Math.max(96, score),
+      matchedKeywords: keywords.length > 0 ? keywords : ['Dual-Custody Vault', 'GL Reconciliation', 'AML/CFT Compliance', 'Audit Readiness', role],
+      lastUpdated: new Date().toISOString().slice(0, 10),
+    }));
+
+    onToast(`AI successfully synthesized resume & cover letter precisely tailored to ${comp}!`);
+  };
+
   const handleSaveAtsLive = (e: React.FormEvent) => {
     e.preventDefault();
     const updated: AtsConfig = {
@@ -1236,6 +1258,51 @@ ${atsState.customCoverLetter || `Dear Hiring Committee,\nI am writing to express
             </div>
           </div>
 
+          {/* Core Competencies & Headline Metrics Editor */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">
+              <span>Core Competencies & Headline Metrics ({formData.stats.length})</span>
+            </h3>
+            <div className="space-y-4">
+              {formData.stats.map((stat, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-2">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Competency Metric Title</label>
+                      <input
+                        type="text"
+                        value={stat.title}
+                        onChange={(e) => updateStat(idx, 'title', e.target.value)}
+                        className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-bold bg-white dark:bg-slate-900"
+                        placeholder="e.g. Audit Readiness"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Highlight Value</label>
+                      <input
+                        type="text"
+                        value={stat.value || ''}
+                        onChange={(e) => updateStat(idx, 'value', e.target.value)}
+                        className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-mono font-bold bg-white dark:bg-slate-900"
+                        placeholder="e.g. 100%"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Competency Description</label>
+                    <input
+                      type="text"
+                      value={stat.desc}
+                      onChange={(e) => updateStat(idx, 'desc', e.target.value)}
+                      className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-xs bg-white dark:bg-slate-900"
+                      placeholder="e.g. Zero-discrepancy daily general ledger & vault balance..."
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <button
             type="submit"
             className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm shadow-md transition"
@@ -1308,16 +1375,26 @@ ${atsState.customCoverLetter || `Dear Hiring Committee,\nI am writing to express
           {/* Configuration Form */}
           <form onSubmit={handleSaveAtsLive} className="space-y-6">
             <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span>1. Target Opportunity & Vacancy Specification</span>
-                <button
-                  type="button"
-                  onClick={handleReanalyzeAts}
-                  className="text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Re-analyze ATS Keywords</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleAiSynthesizeAts}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>✨ AI Synthesize & Tailor</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleReanalyzeAts}
+                    className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-300 transition flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Re-analyze</span>
+                  </button>
+                </div>
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

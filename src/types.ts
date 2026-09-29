@@ -110,7 +110,7 @@ export interface BankingDocument {
   tags?: string[];
 }
 
-export type PageRoute = 'overview' | 'operations' | 'credentials' | 'creeds' | 'essays' | 'studio' | 'contact';
+export type PageRoute = 'overview' | 'operations' | 'credentials' | 'creeds' | 'essays' | 'studio' | 'contact' | 'pwa';
 
 export type ContributorType =
   | 'Portfolio Owner'

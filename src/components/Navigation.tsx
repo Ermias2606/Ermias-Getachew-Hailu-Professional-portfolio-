@@ -20,7 +20,8 @@ import {
   Camera,
   Layers,
   Quote,
-  Sparkles
+  Sparkles,
+  Smartphone
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -145,6 +146,7 @@ export const Navigation: React.FC<NavigationProps> = ({
     { id: 'creeds', label: 'Leadership Creeds & Perspectives', icon: <Quote className="w-3.5 h-3.5" /> },
     { id: 'essays', label: 'Essays & Shelf', icon: <BookOpen className="w-3.5 h-3.5" /> },
     { id: 'studio', label: 'Cover & Resume', icon: <FileText className="w-3.5 h-3.5" /> },
+    { id: 'pwa', label: 'PWA & Offline Hub', icon: <Smartphone className="w-3.5 h-3.5" /> },
     { id: 'contact', label: 'Contact', icon: <Mail className="w-3.5 h-3.5" /> },
   ];
 
