@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Skill } from '../types';
-import { Search, CheckCircle2, ShieldAlert, Sparkles, Filter, ChevronRight } from 'lucide-react';
+import { Search, CheckCircle2, ShieldAlert, Sparkles, Filter, ChevronRight, BarChart3 } from 'lucide-react';
+import { D3RadarChart } from './D3RadarChart';
 
 interface SkillsMatrixProps {
   skills: Skill[];
@@ -56,6 +57,29 @@ export const SkillsMatrix: React.FC<SkillsMatrixProps> = ({ skills, onSelectSkil
             placeholder="Search operational skills..."
             className="w-full pl-9 pr-4 py-2 rounded-xl text-xs sm:text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-500 shadow-sm"
           />
+        </div>
+      </div>
+
+      {/* Radar Chart Proficiency Visualization */}
+      <div className="mb-8 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
+              <BarChart3 className="w-5 h-5" />
+            </span>
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                Domain Proficiency Radar Analysis
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Multi-dimensional evaluation across all 5 core banking operational domains.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full h-72 sm:h-80 flex items-center justify-center">
+          <D3RadarChart skills={skills} selectedDomain={selectedDomain} />
         </div>
       </div>
 

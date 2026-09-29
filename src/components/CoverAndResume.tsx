@@ -73,39 +73,51 @@ export const CoverAndResume: React.FC<CoverAndResumeProps> = ({
   const currentTheme = getThemeStyles();
   const canDownload = atsConfig.allowPublicDownload || isAdmin;
 
+  const [isPrinting, setIsPrinting] = useState<boolean>(false);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+
   const handleExportWord = () => {
     if (!canDownload) {
       onToast?.('Document downloading is restricted by executive policy.');
       return;
     }
 
-    const docElement = document.getElementById('livePublicDocPreview');
-    if (!docElement) return;
+    setIsExporting(true);
+    onToast?.('Synthesizing certified Word document...');
 
-    const htmlContent = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>${profile.name} - ${atsConfig.targetRole}</title>
-      <style>
-        body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: #1e293b; margin: 40px; }
-        h1 { color: ${currentTheme.brandColor}; font-size: 18pt; text-transform: uppercase; margin-bottom: 4px; }
-        h2 { color: ${currentTheme.brandColor}; font-size: 13pt; margin-top: 18px; border-bottom: 1.5pt solid ${currentTheme.brandColor}; padding-bottom: 2pt; text-transform: uppercase; }
-        p { margin-bottom: 8pt; text-align: justify; }
-        ul { margin-top: 4pt; margin-bottom: 8pt; }
-        li { margin-bottom: 4pt; }
-      </style>
-      </head>
-      <body>${docElement.innerHTML}</body>
-      </html>
-    `;
+    setTimeout(() => {
+      const docElement = document.getElementById('livePublicDocPreview');
+      if (!docElement) {
+        setIsExporting(false);
+        return;
+      }
 
-    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Ermias_Getachew_${atsConfig.targetRole.replace(/\s+/g, '_')}_Application.doc`;
-    a.click();
-    URL.revokeObjectURL(url);
-    onToast?.('Word document exported successfully!');
+      const htmlContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>${profile.name} - ${atsConfig.targetRole}</title>
+        <style>
+          body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1e293b; margin: 40px; }
+          h1 { color: ${currentTheme.brandColor}; font-size: 18pt; text-transform: uppercase; margin-bottom: 4px; }
+          h2 { color: ${currentTheme.brandColor}; font-size: 13pt; margin-top: 18px; border-bottom: 1.5pt solid ${currentTheme.brandColor}; padding-bottom: 2pt; text-transform: uppercase; }
+          p { margin-bottom: 8pt; text-align: justify; }
+          ul { margin-top: 4pt; margin-bottom: 8pt; }
+          li { margin-bottom: 4pt; }
+        </style>
+        </head>
+        <body>${docElement.innerHTML}</body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Ermias_Getachew_${atsConfig.targetRole.replace(/\s+/g, '_')}_Application.doc`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setIsExporting(false);
+      onToast?.('Word document exported successfully!');
+    }, 600);
   };
 
   const handlePrint = () => {
@@ -113,7 +125,14 @@ export const CoverAndResume: React.FC<CoverAndResumeProps> = ({
       onToast?.('Document printing/export is restricted by executive policy.');
       return;
     }
-    window.print();
+
+    setIsPrinting(true);
+    onToast?.('Preparing certified print-ready document layout...');
+
+    setTimeout(() => {
+      window.print();
+      setIsPrinting(false);
+    }, 500);
   };
 
   const handleCopyText = () => {
@@ -250,18 +269,20 @@ export const CoverAndResume: React.FC<CoverAndResumeProps> = ({
             <>
               <button
                 onClick={handleExportWord}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold transition shadow-sm"
+                disabled={isExporting}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold transition shadow-sm disabled:opacity-50"
               >
-                <Download className="w-3.5 h-3.5 text-blue-600" />
-                <span>Export Word (.doc)</span>
+                <Download className={`w-3.5 h-3.5 text-blue-600 ${isExporting ? 'animate-bounce' : ''}`} />
+                <span>{isExporting ? 'Exporting .doc...' : 'Export Word (.doc)'}</span>
               </button>
 
               <button
                 onClick={handlePrint}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm"
+                disabled={isPrinting}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
               >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print / Save PDF</span>
+                <Printer className={`w-3.5 h-3.5 ${isPrinting ? 'animate-spin' : ''}`} />
+                <span>{isPrinting ? 'Preparing Print...' : 'Print / Save PDF'}</span>
               </button>
             </>
           ) : (
